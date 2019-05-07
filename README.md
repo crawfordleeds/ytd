@@ -2,6 +2,8 @@
 
 ytd is a command line program that downloads YouTube videos and playlists. It is written in python with the pytube library.
 
+That's the first thing I ever wrote in python, I hope it's good enough to be usefull for others.
+
 ## How to use
 
 `python ytd.py -arguments` or `ytd -arguments` if built to an executable
