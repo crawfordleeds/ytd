@@ -6,7 +6,7 @@ ytd is a command line program that downloads YouTube videos and playlists. It is
 
 `python ytd.py -arguments` or `ytd -arguments` if built to an executable
 
-There two obvious required arguments:
+There are two obvious required arguments:
 
 * `-v 'ur'` to download a single video.
 * `-p 'url'` to download an entire playlist.
