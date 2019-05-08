@@ -1,7 +1,7 @@
 from pytube import YouTube, Playlist
-import argparse, os, time
+import argparse, os, time, pathlib
 
-def video_dl(url, resolution, is_progressive, is_adaptive, is_only_audio, path):
+def video_dl(url, resolution, is_progressive, is_adaptive, is_only_audio, path, numbered, prefix):
 	print('Fetching ...', end='\r')
 	video = YouTube(url, on_progress_callback=progress)
 	print('Downloading: %s' %video.title)
@@ -11,8 +11,11 @@ def video_dl(url, resolution, is_progressive, is_adaptive, is_only_audio, path):
 	else:
 		global file_size
 		file_size = stream.filesize
-		stream.download(path)
-		print('\n')
+		if numbered ==True:
+			stream.download(output_path=path, filename=None, filename_prefix=prefix)
+		else:
+			stream.download(path)
+		print('\nDownload completed')
 	if args.c != None:
 		lang_code = args.c
 		cc = video.captions.get_by_language_code(lang_code)
@@ -26,11 +29,17 @@ def video_dl(url, resolution, is_progressive, is_adaptive, is_only_audio, path):
 	return True
 
 def playlist_dl(url, resolution, is_progressive, is_adaptive, is_only_audio, path):
+	numbered = args.x
 	links = Playlist(url).parse_links()
 	number_of_videos = len(links)
 	print('%s videos in playlist' %number_of_videos)
-	for n in range(number_of_videos):
-		video_dl(links[n], resolution, is_progressive, is_adaptive, is_only_audio, path)
+	t = args.t
+	if t == -1:
+		t = number_of_videos
+	f = args.f - 1
+	for i in range(f, t):
+		prefix = '%d - ' %(i+1)
+		video_dl(links[i], resolution, is_progressive, is_adaptive, is_only_audio, path, numbered, prefix)
 	return True
 
 def progress(stream, chunk, file_handle, bytes_remaining):
@@ -46,6 +55,9 @@ required.add_argument('-p', type = str, metavar = "'url'", default = None, help 
 arguments.add_argument('-o', type = str, metavar = 'path', default = '', help = 'Output path, relative to root directory. (e.g. -o C:\\Users\\Smith\\')
 arguments.add_argument('-r', type = str, metavar = 'resolution', default = None, help = 'Video download resolution. (e.g. -r 480p)')
 arguments.add_argument('-c', type = str, metavar = 'language code', default = None, help = 'Download srt captions. (e.g. -c en)')
+arguments.add_argument('-f', type = int, metavar = 'n', default = 1, help = 'Start downloading playlist from the nth video. (e.g. -f 7)')
+arguments.add_argument('-t', type = int, metavar = 'n', default = -1, help = 'Downloading playlist to the nth video. (e.g. -t 3)')
+arguments.add_argument('-x', action='store_true', default = False, help = 'Number playlis videos.')
 arguments.add_argument('-d', action='store_true', default = False, help = 'Download audio only streams')
 arguments.add_argument('-a', action='store_true', default = False, help = 'Use adaptive streams only')
 arguments.add_argument('-g', action='store_true', default = False, help = 'Use progressive streams only')
@@ -55,7 +67,7 @@ args = arguments.parse_args()
 path = r"%s" %args.o
 if path != '':
 	if not os.path.exists(path):
-		os.mkdir(path)
+		pathlib.Path(path).mkdir(parents=True)
 
 resolution = args.r
 
@@ -78,7 +90,7 @@ if args.p != None and args.v != None:
 	print('Please put either a video or a playlist url, not both.')
 elif args.p == None and args.v != None:
 	url = args.v
-	video_dl(url, resolution, is_progressive, is_adaptive, is_only_audio, path)
+	video_dl(url, resolution, is_progressive, is_adaptive, is_only_audio, path, False, '')
 elif args.v == None and args.p != None:
 	url = args.p
 	playlist_dl(url, resolution, is_progressive, is_adaptive, is_only_audio, path)
