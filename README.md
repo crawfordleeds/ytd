@@ -27,10 +27,10 @@ There are a couple of optional arguments:
 
 ## Dependencies
 
-pytube library, to install it run:
-```
-pip install pytube
-```
+* pytube library, to install it run:
+	```
+	pip install pytube
+	```
 
 ## Building
 
