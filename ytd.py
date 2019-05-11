@@ -1,9 +1,21 @@
 from pytube import YouTube, Playlist
 import argparse, os, time, pathlib
 
+
 def video_dl(url, resolution, is_progressive, is_adaptive, is_only_audio, path, numbered, prefix):
 	print('Fetching ...', end='\r')
-	video = YouTube(url, on_progress_callback=progress)
+	for i in range(6):
+		try:
+			video = YouTube(url, on_progress_callback=progress)
+		except:
+			if i < 5:
+				print('Fetching failed, retrying ... {}' .format(i+1))
+				continue
+			else:
+				print('Five retries failed, skipping current video ...')
+				return -1
+		break
+
 	print('Downloading: %s' %video.title)
 	stream = video.streams.filter(res=resolution, progressive=is_progressive, adaptive=is_adaptive, only_audio=is_only_audio).first()
 	if stream == None:
@@ -16,6 +28,7 @@ def video_dl(url, resolution, is_progressive, is_adaptive, is_only_audio, path, 
 		else:
 			stream.download(path)
 		print('\nDownload completed')
+	
 	if args.c != None:
 		lang_code = args.c
 		cc = video.captions.get_by_language_code(lang_code)
@@ -26,7 +39,9 @@ def video_dl(url, resolution, is_progressive, is_adaptive, is_only_audio, path, 
 			captions_file = open('%s.srt' %video.title, 'w+')
 			captions_file.write(srt)
 			captions_file.close()
-	return True
+	
+	return 0
+
 
 def playlist_dl(url, resolution, is_progressive, is_adaptive, is_only_audio, path):
 	numbered = args.x
@@ -36,11 +51,14 @@ def playlist_dl(url, resolution, is_progressive, is_adaptive, is_only_audio, pat
 	t = args.t
 	if t == -1:
 		t = number_of_videos
+	
 	f = args.f - 1
 	for i in range(f, t):
 		prefix = '%d - ' %(i+1)
 		video_dl(links[i], resolution, is_progressive, is_adaptive, is_only_audio, path, numbered, prefix)
-	return True
+	
+	return 0
+
 
 def progress(stream, chunk, file_handle, bytes_remaining):
 	percent = round((1-bytes_remaining/file_size) ,4)
@@ -48,7 +66,7 @@ def progress(stream, chunk, file_handle, bytes_remaining):
 	print('    %2.2f%%\t>%-40s< %2.2fMB' %(100*percent, '█'*blocks, file_size/(1024*1024)), end='\r')
 
 
-arguments = argparse.ArgumentParser(description = 'YouTube Downloader v1.0')
+arguments = argparse.ArgumentParser(description = 'YouTube Downloader v1.2')
 required = arguments.add_argument_group('required arguments (use only one)')
 required.add_argument('-v', type = str, metavar = "'url'", default = None , help = 'Video URL')
 required.add_argument('-p', type = str, metavar = "'url'", default = None, help = 'Playlists URL')
@@ -70,7 +88,6 @@ if path != '':
 		pathlib.Path(path).mkdir(parents=True)
 
 resolution = args.r
-
 if args.a == True and args.g == True:
 	print('You cannot filter both progressive and adaptive streams ath the same time.')
 	quit()
@@ -85,7 +102,6 @@ else:
 	is_adaptive = False
 
 is_only_audio = args.d
-
 if args.p != None and args.v != None:
 	print('Please put either a video or a playlist url, not both.')
 elif args.p == None and args.v != None:

@@ -1,37 +1,55 @@
-# ytd YouTube Downloader
+# ytd
 
-ytd is a command line program that downloads YouTube videos and playlists. It is written in python with the pytube library.
+ytd is a command line YouTube downloader for videos and playlists. It is written in python with the pytube library.
 
-That's the first thing I ever wrote in python, I hope it's good enough to be usefull for others.
+That's the first thing I wrote in python, I hope it's good enough to be usefull.
 
 ## How to use
 
-`python ytd.py -arguments` or `ytd -arguments` if built to an executable
+`ytd -arguments`
 
 There are two obvious required arguments:
 
 * `-v 'ur'` to download a single video.
-* `-p 'url'` to download an entire playlist.
+* `-p 'url'` to download a playlist.
 
 There are a couple of optional arguments:
 
-* `-o 'path'` to set the download directory.
-* `-r 'res'` to select the video's resolution to download.
-* `-c 'lang'` to download srt captions in the selected language if available.
-* `-d` to download audio streams only (but still in a video format for now).
-* `-g` to download progressive streams only (video and audio in one file).
-* `-a` to download adaptive streams only (video and audio in separate files).
+* `-o 'path'` set the download directory.
+* `-r 'res'` select the video's resolution to download.
+* `-c 'lang'` download srt captions in the selected language if available.
+* `-d` download audio streams only (but still in a video format for now).
+* `-f n` download playlist from the nth video.
+* `-t n` download playlist until the nth video.
+* `-x` number downloaded playlist videos.
+* `-g` download progressive streams only (video and audio in one file).
+* `-a` download adaptive streams only (video and audio in separate files).
+
+## Dependencies
+
+pytube library, to install it run:
+```
+pip install pytube
+```
 
 ## Building
 
-I built it with pyinstaller on Windows.
+I built it with pyinstaller on Windows and Ubuntu.
 
-To install pyinstaller run 
-```python
+To install pyinstaller run:
+```
 pip install pyinstaller
 ```
-to build to a single-file executable run
-```python
+to build to a single-file executable run:
+```
 pyinstaller ytd.py -F
 ```
-the executable can be copied to a PATH directory to run directly from the terminal.
+the executable can be copied to PATH to run directly from the terminal.
+
+## Changelog
+
+### v1.2:
+
+* Added `-f` and `-t` options for selective playlist download.
+* Added `-x` to number playlist videos.
+* Fixed a video fetching bug and handled errors.
