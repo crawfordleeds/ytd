@@ -45,11 +45,3 @@ to build to a single-file executable run:
 pyinstaller ytd.py -F
 ```
 the executable can be copied to PATH to run directly from the terminal.
-
-## Changelog
-
-### v1.2:
-
-* Added `-f` and `-t` options for selective playlist download.
-* Added `-x` to number playlist videos.
-* Fixed a video fetching bug and handled errors.
